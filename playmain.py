@@ -1,5 +1,3 @@
-import os
-
 import pygame
 
 # read and save .xsb as 2d list

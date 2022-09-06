@@ -1,6 +1,12 @@
+import os
+
 def scrape_xsbs():
     for i in range(1, 16):
-        xsb = open(f"levelfiles/level{i}.xsb", "r").read().split(";")
+        if not os.path.exists("xsbs"):
+            os.mkdir("xsbs")
+        if not os.path.exists(f"xsbs/{i}"):
+            os.mkdir(f"xsbs/{i}")
+        xsb = open(f"levelfiles/level{i}.xsb", "r").read().split("\n\n;")
 
         for levelchunk in xsb:
             if levelchunk:
@@ -23,8 +29,8 @@ def scrape_xsbs():
                             newlevel += thing + "\n"
 
                     if w <= 26:
-                        newfile = open(f"C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/xsbs/{i}/{lname}.xsb", "w")
-                        newfile.write(newlevel)
+                        newfile = open(f"xsbs/{i}/{lname.split()[0]}.xsb", "w")
+                        newfile.write("; " + lname + "\n\n" + newlevel)
                         newfile.close()
 
-# scrape_xsbs()
+scrape_xsbs()
