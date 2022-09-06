@@ -86,7 +86,6 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
-            print(placed)
             #up
             if event.key == pygame.K_UP:
                 if pj-1 >= 0:
@@ -182,4 +181,4 @@ while running:
 
     pygame.display.flip()
 
-print(win)
+print("you " + ("win" if win else "lose"))
