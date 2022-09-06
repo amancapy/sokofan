@@ -1,7 +1,7 @@
 import pygame
 
 # read and save .xsb as 2d list
-level = open("C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/xsbs/1/1.xsb").read().split("\n")
+level = open("C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/xsbs/1/48.xsb").read().split("\n")
 level = [list(thing) for thing in level]
 w = len(level[0])
 h = len(level)
@@ -33,7 +33,7 @@ moves = 0
 running = True
 win = False
 while running:
-    # counting how many boxes have been delivered to targets
+    # counting how many boxes have been delivered
     placed = 0
     for line in level:
         for cell in line:
@@ -107,7 +107,7 @@ while running:
             if event.key == pygame.K_UP:
                 if pj - 1 >= 0:
                     ucell = level[pj - 1][pi]
-                    currc = " " if level[pj][pi] else "."
+                    currc = " " if level[pj][pi] == "@" else "."
                     if ucell == " ":
                         level[pj - 1][pi] = "@"
                         level[pj][pi] = currc
@@ -131,7 +131,7 @@ while running:
             elif event.key == pygame.K_DOWN:
                 if pj + 1 <= h:
                     dcell = level[pj + 1][pi]
-                    currc = " " if level[pj][pi] else "."
+                    currc = " " if level[pj][pi] == "@" else "."
                     if dcell == " ":
                         level[pj + 1][pi] = "@"
                         level[pj][pi] = currc
@@ -155,7 +155,7 @@ while running:
             elif event.key == pygame.K_LEFT:
                 if pi - 1 >= 0:
                     lcell = level[pj][pi - 1]
-                    currc = " " if level[pj][pi] else "."
+                    currc = " " if level[pj][pi] == "@" else "."
                     if lcell == " ":
                         level[pj][pi - 1] = "@"
                         level[pj][pi] = currc
@@ -179,7 +179,7 @@ while running:
             elif event.key == pygame.K_RIGHT:
                 if pi + 1 <= w:
                     rcell = level[pj][pi + 1]
-                    currc = " " if level[pj][pi] else "."
+                    currc = " " if level[pj][pi] == "@" else "."
                     if rcell == " ":
                         level[pj][pi + 1] = "@"
                         level[pj][pi] = currc
