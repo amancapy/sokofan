@@ -1,8 +1,11 @@
+import os
+
 import pygame
 
 # read and save .xsb as 2d list
-level = open("C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/xsbs/1/48.xsb").read().split("\n")
-level = [list(thing) for thing in level]
+level = open("xsbs/1/1.xsb").read().split("\n\n")
+lname = level[0].split("; ")[1]
+level = [list(thing) for thing in level[1].split("\n")]
 w = len(level[0])
 h = len(level)
 
@@ -10,17 +13,18 @@ h = len(level)
 pygame.init()
 pygame.display.init()
 screen = pygame.display.set_mode(((w + 1) * 26, (h+1) * 26))
+pygame.display.set_caption(lname)
 
 # pygame resources
 font = pygame.font.SysFont("Courier", 17, bold=True)
 
-ground = pygame.image.load("C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/bg.png")
-player = pygame.image.load("C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/robot.png")
-player_on_target = pygame.image.load("C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/robot_on_target.png")
-wall = pygame.image.load("C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/wall.png")
-box = pygame.image.load("C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/box.png")
-empty_target = pygame.image.load("C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/empty_target.png")
-full_target = pygame.image.load("C:/Users/Aman/Desktop/Everything/CSD311/Sokoproject/full_target.png")
+ground = pygame.image.load("resources/bg.png")
+player = pygame.image.load("resources/robot.png")
+player_on_target = pygame.image.load("resources/robot_on_target.png")
+wall = pygame.image.load("resources/wall.png")
+box = pygame.image.load("resources/box.png")
+empty_target = pygame.image.load("resources/empty_target.png")
+full_target = pygame.image.load("resources/full_target.png")
 
 # counting number of targets
 wincondition = 0
@@ -40,7 +44,7 @@ while running:
             if cell == "*":
                 placed += 1
 
-    # end game if all boxes placed
+    # win and end game if all boxes placed
     if placed == wincondition:
         win = True
         running = False
@@ -51,12 +55,12 @@ while running:
     for i in range(1, w + 1):
         letter = font.render(chr(i + 64), True, (0, 0, 0))
         rect = pygame.Rect(i * 26, 0, 26, 26)
-        pygame.draw.rect(screen, (0, 0, 0), rect, width=2)
+        pygame.draw.rect(screen, (0, 0, 0), rect, width=3)
         screen.blit(letter, (i * 26 + 8, 3))
     for j in range(1, h):
         letter = font.render(chr(j + 96), True, (0, 0, 0))
         rect = pygame.Rect(0, j * 26, 26, 26)
-        pygame.draw.rect(screen, (0, 0, 0), rect, width=2)
+        pygame.draw.rect(screen, (0, 0, 0), rect, width=3)
         screen.blit(letter, (8, j * 26 + 3))
 
     # corner rectangle
