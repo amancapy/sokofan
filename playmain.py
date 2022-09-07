@@ -1,28 +1,30 @@
 import pygame
 
 # read and save .xsb as 2d list
-level = open("xsbs/1/1.xsb").read().split("\n\n")
+chosen = "1/49"
+level = open(f"xsbs/{chosen}.xsb").read().split("\n\n")
 lname = level[0].split("; ")[1]
 level = [list(thing) for thing in level[1].split("\n")]
 w = len(level[0])
 h = len(level)
 
 # init pygame
+csize = 32
 pygame.init()
 pygame.display.init()
-screen = pygame.display.set_mode(((w + 1) * 26, (h+1) * 26))
+screen = pygame.display.set_mode(((w + 1) * csize, (h+1) * csize))
 pygame.display.set_caption(lname)
 
 # pygame resources
-font = pygame.font.SysFont("Courier", 17, bold=True)
+font = pygame.font.SysFont("Courier", 20, bold=True)
 
-ground = pygame.image.load("resources/bg.png")
-player = pygame.image.load("resources/robot.png")
-player_on_target = pygame.image.load("resources/robot_on_target.png")
-wall = pygame.image.load("resources/wall.png")
-box = pygame.image.load("resources/box.png")
-empty_target = pygame.image.load("resources/empty_target.png")
-full_target = pygame.image.load("resources/full_target.png")
+ground = pygame.image.load("resources/ground.png").convert()
+player = pygame.image.load("resources/robot_on_ground.png").convert()
+player_on_target = pygame.image.load("resources/robot_on_target.png").convert()
+wall = pygame.image.load("resources/wall.png").convert()
+box = pygame.image.load("resources/box.png").convert()
+empty_target = pygame.image.load("resources/empty_target.png").convert()
+full_target = pygame.image.load("resources/full_target.png").convert()
 
 # counting number of targets
 wincondition = 0
@@ -36,8 +38,9 @@ losses = 0
 resets = 0
 
 def level_reset(winbool):
+    pygame.time.Clock().tick(500)
     global losses, wins, resets
-    lvl = open("xsbs/1/1.xsb").read().split("\n\n")
+    lvl = open(f"xsbs/{chosen}.xsb").read().split("\n\n")
     lvl = [list(thing) for thing in lvl[1].split("\n")]
 
     if winbool:
@@ -64,7 +67,7 @@ while running:
     # win and end game if all boxes placed
     if placed == wincondition:
         win = True
-        level_reset(win)
+        level = level_reset(win)
 
     # lose and reset game if any box is cornered in non-target cell
     for i in range(w):
@@ -88,27 +91,29 @@ while running:
     # naming rows and columns with letters a-z and A-Z
     for i in range(1, w + 1):
         letter = font.render(chr(i + 64), True, (0, 0, 0))
-        rect = pygame.Rect(i * 26, 0, 26, 26)
-        pygame.draw.rect(screen, (0, 0, 0), rect, width=3)
-        screen.blit(letter, (i * 26 + 8, 3))
+        screen.blit(ground, (i*csize, 0))
+        rect = pygame.Rect(i * csize, 0, csize, csize)
+        pygame.draw.rect(screen, (0, 0, 0), rect, width=2)
+        screen.blit(letter, (i * csize + 10, 4))
     for j in range(1, h):
         letter = font.render(chr(j + 96), True, (0, 0, 0))
-        rect = pygame.Rect(0, j * 26, 26, 26)
-        pygame.draw.rect(screen, (0, 0, 0), rect, width=3)
-        screen.blit(letter, (8, j * 26 + 3))
+        screen.blit(ground, (0, j*csize))
+        rect = pygame.Rect(0, j * csize, csize, csize)
+        pygame.draw.rect(screen, (0, 0, 0), rect, width=2)
+        screen.blit(letter, (10, j * csize + 4))
 
     # corner rectangle
-    rect = pygame.Rect(0, 0, 26, 26)
+    rect = pygame.Rect(0, 0, csize, csize)
     pygame.draw.rect(screen, (0, 0, 0), rect)
     # displaying number of moves made
     moves_ = font.render("moves: " + str(moves), True, (0, 0, 0))
-    screen.blit(moves_, (8, h*26+3))
+    screen.blit(moves_, (8, h*csize+3))
 
     # going through the 2d list and rendering the ascii characters as their respective textures
     for i in range(w):
         for j in range(h - 1):
-            ci = (i + 1) * 26
-            cj = (j + 1) * 26
+            ci = (i + 1) * csize
+            cj = (j + 1) * csize
             cell = level[j][i]
             if cell == " ":
                 screen.blit(ground, (ci, cj))
@@ -240,4 +245,3 @@ while running:
                         moves += 1
 
     pygame.display.flip()
-
