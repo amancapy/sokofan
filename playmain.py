@@ -33,20 +33,22 @@ for line in level:
 
 wins = 0
 losses = 0
+resets = 0
 
-def level_reset(win):
+def level_reset(winbool):
     global losses, wins, resets
-    level = open("xsbs/1/1.xsb").read().split("\n\n")
-    level = [list(thing) for thing in level[1].split("\n")]
+    lvl = open("xsbs/1/1.xsb").read().split("\n\n")
+    lvl = [list(thing) for thing in lvl[1].split("\n")]
 
-    if win:
+    if winbool:
         wins += 1
     else:
         losses += 1
 
     resets = wins + losses
     print(f"wins: {wins}, losses: {losses}, total: {resets}")
-    return level
+    return lvl
+
 moves = 0
 running = True
 while running:
