@@ -47,6 +47,23 @@ while running:
         win = True
         running = False
 
+    # lose and end game if any box is cornered in non-target cell
+    for i in range(w):
+        for j in range(h-1):
+            if level[j][i] == "$":
+                if i+1 <= h and level[j][i+1] == "#":
+                    if (j+1 <= w and level[j+1][i] == "#") or (j-1 >= 0 and level[j-1][i] == "#"):
+                        running = False
+                elif i-1 >= w and level[j][i-1] == "#":
+                    if (j+1 <= w and level[j+1][i] == "#") or (j-1 >= 0 and level[j-1][i] == "#"):
+                        running = False
+                elif j+1 <= w and level[j+1][i] == "#":
+                    if (i+1 <= h and level[j][i+1] == "#") or (i-1 >= 0 and level[j][i-1] == "#"):
+                        running = False
+                elif j-1 >= 0 and level[j-1][i] == "#":
+                    if (i+1 <= h and level[j][i+1] == "#") or (i-1 >= 0 and level[j][i-1] == "#"):
+                        running = False
+
     screen.fill((155, 173, 183))
 
     # naming rows and columns with letters a-z and A-Z
@@ -200,8 +217,8 @@ while running:
                             level[pj][pi + 2] = "*"
                             level[pj][pi + 1] = "@" if rcell == "$" else "+"
                             level[pj][pi] = currc
-                            moves += 1
+                        moves += 1
 
     pygame.display.flip()
 
-print("you " + ("win" if win else "lose"))
+print("you " + (f"win in {moves} moves." if win else "lose."))
