@@ -34,6 +34,7 @@ for line in level:
 moves = 0
 running = True
 win = False
+reason = ""
 while running:
     # counting how many boxes have been delivered
     placed = 0
@@ -54,15 +55,19 @@ while running:
                 if i+1 <= h and level[j][i+1] == "#":
                     if (j+1 <= w and level[j+1][i] == "#") or (j-1 >= 0 and level[j-1][i] == "#"):
                         running = False
+                        reason = "cornering a box"
                 elif i-1 >= w and level[j][i-1] == "#":
                     if (j+1 <= w and level[j+1][i] == "#") or (j-1 >= 0 and level[j-1][i] == "#"):
                         running = False
+                        reason = "cornering a box"
                 elif j+1 <= w and level[j+1][i] == "#":
                     if (i+1 <= h and level[j][i+1] == "#") or (i-1 >= 0 and level[j][i-1] == "#"):
                         running = False
+                        reason = "cornering a box"
                 elif j-1 >= 0 and level[j-1][i] == "#":
                     if (i+1 <= h and level[j][i+1] == "#") or (i-1 >= 0 and level[j][i-1] == "#"):
                         running = False
+                        reason = "cornering a box"
 
     screen.fill((155, 173, 183))
 
@@ -121,6 +126,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+            reason = "giving up"
         elif event.type == pygame.KEYDOWN:
             # up
             if event.key == pygame.K_UP:
@@ -221,4 +227,4 @@ while running:
 
     pygame.display.flip()
 
-print("you " + (f"win in {moves} moves." if win else "lose."))
+print("you " + (f"win in {moves} moves." if win else f"lose by {reason}."))
