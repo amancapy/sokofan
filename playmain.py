@@ -31,11 +31,27 @@ for line in level:
         if cell == "." or cell == "*" or cell == "+":
             wincondition += 1
 
+wins = 0
+losses = 0
+
+def level_reset(win):
+    global losses, wins, resets
+    level = open("xsbs/1/1.xsb").read().split("\n\n")
+    level = [list(thing) for thing in level[1].split("\n")]
+
+    if win:
+        wins += 1
+    else:
+        losses += 1
+
+    resets = wins + losses
+    print(f"wins: {wins}, losses: {losses}, total: {resets}")
+    return level
 moves = 0
 running = True
-win = False
-reason = ""
 while running:
+    win = False
+
     # counting how many boxes have been delivered
     placed = 0
     for line in level:
@@ -46,28 +62,24 @@ while running:
     # win and end game if all boxes placed
     if placed == wincondition:
         win = True
-        running = False
+        level_reset(win)
 
-    # lose and end game if any box is cornered in non-target cell
+    # lose and reset game if any box is cornered in non-target cell
     for i in range(w):
         for j in range(h-1):
             if level[j][i] == "$":
                 if i+1 <= h and level[j][i+1] == "#":
                     if (j+1 <= w and level[j+1][i] == "#") or (j-1 >= 0 and level[j-1][i] == "#"):
-                        running = False
-                        reason = "cornering a box"
+                        level = level_reset(False)
                 elif i-1 >= w and level[j][i-1] == "#":
                     if (j+1 <= w and level[j+1][i] == "#") or (j-1 >= 0 and level[j-1][i] == "#"):
-                        running = False
-                        reason = "cornering a box"
+                        level = level_reset(False)
                 elif j+1 <= w and level[j+1][i] == "#":
                     if (i+1 <= h and level[j][i+1] == "#") or (i-1 >= 0 and level[j][i-1] == "#"):
-                        running = False
-                        reason = "cornering a box"
+                        level = level_reset(False)
                 elif j-1 >= 0 and level[j-1][i] == "#":
                     if (i+1 <= h and level[j][i+1] == "#") or (i-1 >= 0 and level[j][i-1] == "#"):
-                        running = False
-                        reason = "cornering a box"
+                        level = level_reset(False)
 
     screen.fill((155, 173, 183))
 
@@ -227,4 +239,3 @@ while running:
 
     pygame.display.flip()
 
-print("you " + (f"win in {moves} moves." if win else f"lose by {reason}."))
