@@ -25,6 +25,8 @@ wall = pygame.image.load("resources/wall.png").convert()
 box = pygame.image.load("resources/box.png").convert()
 empty_target = pygame.image.load("resources/empty_target.png").convert()
 full_target = pygame.image.load("resources/full_target.png").convert()
+full_ground = pygame.image.load("resources/full_ground.png").convert()
+icon = pygame.transform.scale(pygame.image.load("resources/icon.png").convert(), (csize, csize))
 
 # counting number of targets
 wincondition = 0
@@ -38,7 +40,6 @@ losses = 0
 resets = 0
 
 def level_reset(winbool):
-    pygame.time.Clock().tick(500)
     global losses, wins, resets
     lvl = open(f"xsbs/{chosen}.xsb").read().split("\n\n")
     lvl = [list(thing) for thing in lvl[1].split("\n")]
@@ -54,7 +55,9 @@ def level_reset(winbool):
 
 moves = 0
 running = True
-while running:
+while 1:
+    if not running:
+        break
     win = False
 
     # counting how many boxes have been delivered
@@ -88,23 +91,24 @@ while running:
 
     screen.fill((155, 173, 183))
 
+    # background
+    screen.blit(full_ground, (0, 0))
+
     # naming rows and columns with letters a-z and A-Z
     for i in range(1, w + 1):
         letter = font.render(chr(i + 64), True, (0, 0, 0))
-        screen.blit(ground, (i*csize, 0))
         rect = pygame.Rect(i * csize, 0, csize, csize)
         pygame.draw.rect(screen, (0, 0, 0), rect, width=2)
         screen.blit(letter, (i * csize + 10, 4))
     for j in range(1, h):
         letter = font.render(chr(j + 96), True, (0, 0, 0))
-        screen.blit(ground, (0, j*csize))
         rect = pygame.Rect(0, j * csize, csize, csize)
         pygame.draw.rect(screen, (0, 0, 0), rect, width=2)
         screen.blit(letter, (10, j * csize + 4))
 
-    # corner rectangle
-    rect = pygame.Rect(0, 0, csize, csize)
-    pygame.draw.rect(screen, (0, 0, 0), rect)
+    # corner icon
+    screen.blit(icon, (0, 0))
+
     # displaying number of moves made
     moves_ = font.render("moves: " + str(moves), True, (0, 0, 0))
     screen.blit(moves_, (8, h*csize+3))
@@ -115,9 +119,7 @@ while running:
             ci = (i + 1) * csize
             cj = (j + 1) * csize
             cell = level[j][i]
-            if cell == " ":
-                screen.blit(ground, (ci, cj))
-            elif cell == "@":
+            if cell == "@":
                 screen.blit(player, (ci, cj))
             elif cell == "+":
                 screen.blit(player_on_target, (ci, cj))
@@ -142,6 +144,7 @@ while running:
                     break
 
     # event manager 🤓
+    pygame.event.set_allowed([pygame.KEYDOWN])
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False

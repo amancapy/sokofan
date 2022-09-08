@@ -1,6 +1,6 @@
 import os
 
-def scrape_xsbs():
+def parse_xsbs():
     for i in range(1, 16):
         if not os.path.exists("xsbs"):
             os.mkdir("xsbs")
@@ -33,4 +33,4 @@ def scrape_xsbs():
                         newfile.write("; " + lname + "\n\n" + newlevel)
                         newfile.close()
 
-scrape_xsbs()
+parse_xsbs()
