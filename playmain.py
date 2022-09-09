@@ -1,9 +1,9 @@
 import pygame
 
 # read and save .xsb as 2d list
-chosen = "1/1"
+chosen = "1/49"
 level = open(f"xsbs/{chosen}.xsb").read().split("\n\n")
-lname = level[0].split("; ")[1]
+lname = chosen.split("/")[0] + "/" + level[0].split("; ")[1]
 level = [list(thing) for thing in level[1].split("\n")]
 w = len(level[0])
 h = len(level)
@@ -18,7 +18,6 @@ pygame.display.set_caption(lname)
 # pygame resources
 font = pygame.font.SysFont("Courier", 20, bold=True)
 
-ground = pygame.image.load("resources/ground.png").convert()
 player = pygame.image.load("resources/robot_on_ground.png").convert()
 player_on_target = pygame.image.load("resources/robot_on_target.png").convert()
 wall = pygame.image.load("resources/wall.png").convert()
@@ -104,8 +103,8 @@ while 1:
     # corner icon
     screen.blit(icon, (0, 0))
 
-    # displaying number of moves made
-    moves_ = font.render("moves: " + str(moves), True, (0, 0, 0))
+    # displaying moves, wins, losses
+    moves_ = font.render(f"moves: {moves}", True, (0, 0, 0))
     screen.blit(moves_, (8, h*csize+3))
 
     # going through the 2d list and rendering the ascii characters as their respective textures
@@ -120,6 +119,7 @@ while 1:
                 screen.blit(player, (ci, cj))
             elif cell == "+":
                 screen.blit(player_on_target, (ci, cj))
+                pi, pj = i, j
             elif cell == "#":
                 screen.blit(wall, (ci, cj))
             elif cell == "$":
@@ -134,8 +134,10 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-            reason = "giving up"
         elif event.type == pygame.KEYDOWN:
+            # reset
+            if event.key == pygame.K_r:
+                level = level_reset(False)
             # up
             if event.key == pygame.K_UP:
                 if pj - 1 >= 0:
