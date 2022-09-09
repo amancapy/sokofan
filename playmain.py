@@ -1,7 +1,7 @@
 import pygame
 
 # read and save .xsb as 2d list
-chosen = "1/49"
+chosen = "1/1"
 level = open(f"xsbs/{chosen}.xsb").read().split("\n\n")
 lname = level[0].split("; ")[1]
 level = [list(thing) for thing in level[1].split("\n")]
@@ -40,7 +40,7 @@ losses = 0
 resets = 0
 
 def level_reset(winbool):
-    global losses, wins, resets
+    global losses, wins, resets, moves
     lvl = open(f"xsbs/{chosen}.xsb").read().split("\n\n")
     lvl = [list(thing) for thing in lvl[1].split("\n")]
 
@@ -51,6 +51,7 @@ def level_reset(winbool):
 
     resets = wins + losses
     print(f"wins: {wins}, losses: {losses}, total: {resets}")
+    moves = 0
     return lvl
 
 moves = 0
@@ -76,13 +77,7 @@ while 1:
     for i in range(w):
         for j in range(h-1):
             if level[j][i] == "$":
-                if i+1 <= h and level[j][i+1] == "#":
-                    if (j+1 <= w and level[j+1][i] == "#") or (j-1 >= 0 and level[j-1][i] == "#"):
-                        level = level_reset(False)
-                elif i-1 >= w and level[j][i-1] == "#":
-                    if (j+1 <= w and level[j+1][i] == "#") or (j-1 >= 0 and level[j-1][i] == "#"):
-                        level = level_reset(False)
-                elif j+1 <= w and level[j+1][i] == "#":
+                if j+1 <= h and level[j+1][i] == "#":
                     if (i+1 <= h and level[j][i+1] == "#") or (i-1 >= 0 and level[j][i-1] == "#"):
                         level = level_reset(False)
                 elif j-1 >= 0 and level[j-1][i] == "#":
@@ -114,12 +109,14 @@ while 1:
     screen.blit(moves_, (8, h*csize+3))
 
     # going through the 2d list and rendering the ascii characters as their respective textures
+    pi, pj = 0, 0
     for i in range(w):
         for j in range(h - 1):
             ci = (i + 1) * csize
             cj = (j + 1) * csize
             cell = level[j][i]
             if cell == "@":
+                pi, pj = i, j
                 screen.blit(player, (ci, cj))
             elif cell == "+":
                 screen.blit(player_on_target, (ci, cj))
@@ -131,17 +128,6 @@ while 1:
                 screen.blit(empty_target, (ci, cj))
             elif cell == "*":
                 screen.blit(full_target, (ci, cj))
-
-    # finding the player's coords
-    pi, pj = 0, 0
-    pfound = False
-    while not pfound:
-        for i in range(w):
-            for j in range(h - 1):
-                if level[j][i] == "@" or level[j][i] == "+":
-                    pi, pj = i, j
-                    pfound = True
-                    break
 
     # event manager 🤓
     pygame.event.set_allowed([pygame.KEYDOWN])
