@@ -1,7 +1,7 @@
 import pygame
 
 # read and save .xsb as 2d list
-chosen = "1/49"
+chosen = "1/1"
 level = open(f"xsbs/{chosen}.xsb").read().split("\n\n")
 lname = chosen.split("/")[0] + "/" + level[0].split("; ")[1]
 level = [list(thing) for thing in level[1].split("\n")]
@@ -235,4 +235,5 @@ while 1:
                             level[pj][pi] = currc
                         moves += 1
 
+    pygame.time.Clock().tick(45)
     pygame.display.flip()
