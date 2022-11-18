@@ -4,6 +4,7 @@ import random
 import os
 import numpy as np
 from time import perf_counter as ptime
+from numba import jit, njit
 from heapq import heappop as hpop, heappush as hpsh, heapify as hpfy
 
 
@@ -23,6 +24,7 @@ def inter(arr):
 
 
 # checking if the given state has been fully sorted, by checking if there aren't any unplaced boxes (4) left
+@njit(parallel=True)
 def solved(sstate):
     return not np.isin(4, sstate)
 
@@ -36,20 +38,23 @@ startstate = startstate[1].split("\n")
 startstate = [list(row) for row in startstate if row]
 startstate = inter(startstate)
 
-# we have a list of all 2x2 and 3x3 deadlocks, but it is inefficient to check for each of them for each child.
-# so we only check the ones that *can* occur in our level by comparing wall structure. waller() strips the level
-# and the deadlocks of everything but walls, and sees if they can occur in the level.
-def waller(m):
-    mcopy = np.copy(m)
+
+# we have a list of all 2x2 and 3x3 deadlocks, but it is inefficient to check for *all* of them for each child.
+# so we only check the ones that *can* occur in our level by comparing wall structures. waller() strips the level
+# and the deadlocks down to just the walls, and sees if latter can even occur here
+def waller(mat):
+    mcopy = np.copy(mat)
     for celltype in (1, 2, 4, 5, 6):
         mcopy[mcopy == celltype] = 0
     return mcopy
 
 
 # checks if smat is in mat. this is to check if there is a deadlock in our state
+@jit(forceobj=True, parallel=True)
 def submatrix(mat, smat):
-    return bool((np.lib.stride_tricks.sliding_window_view(mat, smat.shape).reshape(-1, *smat.shape) == smat)
-                .all(axis=(1, 2)).any())
+    return (np.lib.stride_tricks.sliding_window_view(mat, smat.shape)
+            .reshape(-1, *smat.shape) == smat).all(axis=(1, 2)).any()
+
 
 # filtering the deadlocks
 allDLs = [[[6, 6], [6, 4]], [[6, 6], [4, 6]], [[4, 6], [6, 6]], [[6, 4], [6, 6]], [[6, 4], [6, 4]], [[6, 6], [4, 4]],
@@ -87,21 +92,24 @@ for dl in allDLs:
         filteredDLs.append(dl)
 
 
-# checks for possible deadlocks
+# checks for possible deadlocks. this function is clearly state-dependent
+@jit(forceobj=True, parallel=True)
 def deadlock(dlstate):
     for dl in filteredDLs:
-        if submatrix(dlstate, np.array(dl, dtype=np.uint8)):
+        if bool(submatrix(dlstate, np.array(dl, dtype=np.uint8))):
             return True
     return False
 
 
 # get player's index
+@njit(parallel=True)
 def pij(pstate):
     return np.where((pstate == 1) | (pstate == 2))
 
 
 # current state's *push* children. tentative: can try backward search with *pull* children as well
-def pushChildren(pstate):
+@jit(forceobj=True, parallel=True)
+def children(pstate):
     pi, pj = pij(pstate)
     ch, cw = pstate.shape
     childs = []
@@ -115,8 +123,7 @@ def pushChildren(pstate):
                 cstate = dc(pstate)
                 cstate[pi, pj] = 0 if pstate[pi, pj] == 1 else 5
                 cstate[i1, j1] = 1 if pstate[i1, j1] == 0 else 2
-                if not deadlock(cstate):
-                    childs.append(cstate)
+                childs.append(cstate)
             elif pstate[i1, j1] in (4, 6):
                 if 0 <= i2 < ch and 0 <= j2 < cw:
                     if pstate[i2, j2] in (0, 5):
@@ -129,19 +136,20 @@ def pushChildren(pstate):
     return dc(childs)
 
 
-childs = pushChildren(startstate)
-for row in startstate:
-    print(row)
-print()
-print()
-
-for child in childs:
-    for row in child:
-        ...
-        print(row)
-    print()
-print(len(childs))
+stime = ptime()
+for _ in range(100000):
+    children(startstate)
+print((ptime() - stime) / 100000, ptime()-stime)
 
 
-def pullChildren(pstate):
-    ...  # tentative
+# childs = children(startstate)
+# for row in startstate:
+#     print(row)
+# print()
+# print()
+#
+# for child in childs:
+#     for row in child:
+#         print(row)
+#     print()
+# print(len(childs))
