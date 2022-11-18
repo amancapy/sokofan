@@ -3,9 +3,11 @@ from copy import deepcopy as dc
 import random
 import os
 import numpy as np
+from time import perf_counter as ptime
 from heapq import heappop as hpop, heappush as hpsh, heapify as hpfy
 
 
+# turns string input to integers for numpy
 def inter(arr):
     arr = [list(row) for row in arr]
     arr = [[int(char
@@ -17,13 +19,26 @@ def inter(arr):
                 .replace(".", "5")
                 .replace("*", "6"))
             for char in row] for row in arr]
-    return np.array(arr)
+    return np.array(arr, dtype=np.uint8)
 
 
+# checking if the given state has been fully sorted, by checking if there aren't any unplaced boxes (4) left
 def solved(sstate):
-    return np.isin(4, sstate)
+    return not np.isin(4, sstate)
 
 
+pick = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 100)}.xsb"
+while not os.path.exists(pick):
+    pick = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 100)}.xsb"
+startstate = open(pick).read().split("\n\n")
+lname = pick.split("/")[0] + "/" + startstate[0].split("; ")[1]
+startstate = startstate[1].split("\n")
+startstate = [list(row) for row in startstate if row]
+startstate = inter(startstate)
+
+# we have a list of all 2x2 and 3x3 deadlocks, but it is inefficient to check for each of them for each child.
+# so we only check the ones that *can* occur in our level by comparing wall structure. waller() strips the level
+# and the deadlocks of everything but walls, and sees if they can occur in the level.
 def waller(m):
     mcopy = np.copy(m)
     for celltype in (1, 2, 4, 5, 6):
@@ -31,11 +46,12 @@ def waller(m):
     return mcopy
 
 
+# checks if smat is in mat. this is to check if there is a deadlock in our state
 def submatrix(mat, smat):
     return bool((np.lib.stride_tricks.sliding_window_view(mat, smat.shape).reshape(-1, *smat.shape) == smat)
                 .all(axis=(1, 2)).any())
 
-
+# filtering the deadlocks
 allDLs = [[[6, 6], [6, 4]], [[6, 6], [4, 6]], [[4, 6], [6, 6]], [[6, 4], [6, 6]], [[6, 4], [6, 4]], [[6, 6], [4, 4]],
           [[4, 6], [4, 6]], [[4, 4], [6, 6]], [[4, 4], [6, 4]], [[6, 4], [4, 4]], [[4, 6], [4, 4]], [[4, 4], [4, 6]],
           [[6, 4], [4, 6]], [[4, 6], [6, 4]], [[6, 4], [4, 6]], [[4, 6], [6, 4]], [[3, 3], [3, 4]], [[3, 3], [4, 3]],
@@ -65,38 +81,26 @@ allDLs = [[[6, 6], [6, 4]], [[6, 6], [4, 6]], [[4, 6], [6, 6]], [[6, 4], [6, 6]]
           [[0, 4, 3], [3, 4, 0], [0, 0, 0]], [[0, 3, 0], [0, 4, 4], [0, 0, 3]], [[0, 0, 0], [0, 4, 3], [3, 4, 0]],
           [[3, 0, 0], [4, 4, 0], [0, 3, 0]], [[0, 3, 0], [4, 0, 4], [4, 4, 4]], [[4, 4, 0], [4, 0, 3], [4, 4, 0]],
           [[4, 4, 4], [4, 0, 4], [0, 3, 0]], [[0, 4, 4], [3, 0, 4], [0, 4, 4]]]
-
-pick = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 100)}.xsb"
-while not os.path.exists(pick):
-    pick = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 100)}.xsb"
-startstate = open(pick).read().split("\n\n")
-lname = pick.split("/")[0] + "/" + startstate[0].split("; ")[1]
-startstate = startstate[1].split("\n")
-startstate = [list(row) for row in startstate if row]
-startstate = inter(startstate)
-
-filtDLs = []
+filteredDLs = []
 for dl in allDLs:
     if submatrix(waller(startstate), waller(dl)):
-        filtDLs.append(dl)
+        filteredDLs.append(dl)
 
 
+# checks for possible deadlocks
 def deadlock(dlstate):
-    for dl in filtDLs:
-        if submatrix(dlstate, np.array(dl)):
+    for dl in filteredDLs:
+        if submatrix(dlstate, np.array(dl, dtype=np.uint8)):
             return True
     return False
 
 
+# get player's index
 def pij(pstate):
     return np.where((pstate == 1) | (pstate == 2))
 
 
-print(pij(startstate))
-for row in startstate:
-    print(row)
-
-
+# current state's *push* children. tentative: can try backward search with *pull* children as well
 def pushChildren(pstate):
     pi, pj = pij(pstate)
     ch, cw = pstate.shape
@@ -125,19 +129,19 @@ def pushChildren(pstate):
     return dc(childs)
 
 
-print(len(pushChildren(startstate)))
+childs = pushChildren(startstate)
+for row in startstate:
+    print(row)
+print()
+print()
 
-
-# for child in pushChildren(startstate):
-#     for row in child:
-#         ...
-#         print(row)
-#         print()
-#     print()
-#     print()
+for child in childs:
+    for row in child:
+        ...
+        print(row)
+    print()
+print(len(childs))
 
 
 def pullChildren(pstate):
-    pi, pj = pij(pstate)
-    ch, cw = len(pstate), len(pstate[0])
-    childs = []
+    ...  # tentative
