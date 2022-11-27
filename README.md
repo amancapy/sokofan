@@ -1,11 +1,8 @@
 # sokoproject
 **Artificial Intelligence CSD311 project to make a sokoban solver**
 
+A* with a mid heuristic and tree pruning. Two prunes applied as explained in the code; the more complicated ones such as corrals and such are beyond the scope of a single dude doing a semester group project.
 
-06/09 sokoban fully playable now, haven't implemented loss condition if box cornered yet
+18/11 massive change/total redo: children generator complete and so much neater, translated whole project into the numpy environment to make use of sliding windows etc. etc., much more solid checks for deadlock as a result, using numba to leverage the numpy shift, child generator down to ~0.003s per call. node visiting rate itself stands to be seen. heuristics yet to be defined. project more or less unrecognizable since the first commits.
 
-07/09 loss condition if box cornered into non-target cell
-
-09/09 no real progress, optimised the pygame bits a bunch and handcrafted the textures to perfection (doesn't help with ai btw)
-
-18/11 massive change/total redo: children generator complete and so much neater, translated whole project into the numpy environment to make use of sliding windows etc. etc., much more solid checks for deadlock as a result, using numba to leverage the numpy shift, core function down to ~0.003s per call. node visiting rate itself stands to be seen. heuristics yet to be defined. project more or less unrecognizable since the first commits.
+27/11: mediocre heuristic, passable solve times on smaller levels. the bottleneck is the heap operations themselves unfortunately.
