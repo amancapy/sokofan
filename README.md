@@ -1,4 +1,4 @@
-# sokoproject
+# sokofan
 **Artificial Intelligence CSD311 project to make a sokoban solver**
 
 A* with a mid heuristic and tree pruning. Two prunes applied as explained in the code; the more complicated ones such as corrals and such are beyond the scope of a single dude doing a semester group project.
