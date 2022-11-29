@@ -5,6 +5,7 @@ import os
 import numpy as np
 from time import perf_counter as ptime
 from numba import jit, njit, prange
+import gc
 from heapq import heappop as hpop, heappush as hpsh, heapify as hpfy
 
 
@@ -19,7 +20,8 @@ def inter(arr):
                 .replace("$", "4")
                 .replace(".", "5")
                 .replace("*", "6"))
-            for char in row] for row in arr]
+            for char in row]
+           for row in arr]
     return np.array(arr, dtype=np.uint8)
 
 
@@ -29,11 +31,11 @@ def solved(sstate):
     return not np.isin(4, sstate)
 
 
-pick = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 100)}.xsb"
-while not os.path.exists(pick):
-    pick = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 100)}.xsb"
-pick = "newxsbs/1.xsb"
-pick = "xsbs/1/4.xsb"
+# pick = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 100)}.xsb"
+# while not os.path.exists(pick):
+#     pick = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 100)}.xsb"
+
+pick = "newxsbs1/1.xsb"
 startstate = open(pick).read().split("\n\n")
 lname = pick.split("/")[0] + "/" + startstate[0].split("; ")[1]
 startstate = startstate[1].split("\n")
@@ -54,8 +56,8 @@ def waller(mat):
 # checks if smat is in mat. this is to check if there is a deadlock in our state
 @jit(forceobj=True, parallel=True)
 def submatrix(mat, smat):
-    return (np.lib.stride_tricks.sliding_window_view(mat, smat.shape)
-            .reshape(-1, *smat.shape) == smat).all(axis=(1, 2)).any()
+    return (np.lib.stride_tricks.sliding_window_view(mat, smat.shape).reshape(-1, *smat.shape) == smat).all(
+        axis=(1, 2)).any()
 
 
 # filtering the deadlocks
@@ -65,29 +67,30 @@ allDLs = [[[6, 6], [6, 4]], [[6, 6], [4, 6]], [[4, 6], [6, 6]], [[6, 4], [6, 6]]
           [[4, 3], [3, 3]], [[3, 4], [3, 3]], [[3, 4], [3, 4]], [[3, 3], [4, 4]], [[4, 3], [4, 3]], [[4, 4], [3, 3]],
           [[4, 4], [3, 4]], [[3, 4], [4, 4]], [[4, 3], [4, 4]], [[4, 4], [4, 3]], [[4, 4], [4, 4]], [[4, 4], [4, 4]],
           [[4, 4], [4, 4]], [[4, 4], [4, 4]], [[3, 4], [4, 3]], [[4, 3], [3, 4]], [[3, 4], [4, 3]], [[4, 3], [3, 4]],
-          [[3, 3, 0], [3, 0, 3], [0, 4, 3]], [[0, 3, 3], [4, 0, 3], [3, 3, 0]], [[3, 4, 0], [3, 0, 3], [0, 3, 3]],
-          [[0, 3, 3], [3, 0, 4], [3, 3, 0]], [[3, 3, 0], [3, 0, 3], [0, 4, 4]], [[0, 3, 3], [4, 0, 3], [4, 3, 0]],
-          [[4, 4, 0], [3, 0, 3], [0, 3, 3]], [[0, 3, 4], [3, 0, 4], [3, 3, 0]], [[3, 3, 0], [3, 0, 4], [0, 4, 3]],
-          [[0, 3, 3], [4, 0, 3], [3, 4, 0]], [[3, 4, 0], [4, 0, 3], [0, 3, 3]], [[0, 4, 3], [3, 0, 4], [3, 3, 0]],
-          [[3, 3, 0], [3, 0, 4], [0, 4, 4]], [[0, 3, 3], [4, 0, 3], [4, 4, 0]], [[4, 4, 0], [4, 0, 3], [0, 3, 3]],
-          [[0, 4, 4], [3, 0, 4], [3, 3, 0]], [[3, 4, 0], [3, 0, 4], [0, 4, 4]], [[0, 3, 3], [4, 0, 4], [4, 4, 0]],
-          [[4, 4, 0], [4, 0, 3], [0, 4, 3]], [[0, 4, 4], [4, 0, 4], [3, 3, 0]], [[4, 3, 0], [3, 0, 4], [0, 4, 4]],
-          [[0, 3, 4], [4, 0, 3], [4, 4, 0]], [[4, 4, 0], [4, 0, 3], [0, 3, 4]], [[0, 4, 4], [3, 0, 4], [4, 3, 0]],
-          [[4, 4, 0], [3, 0, 4], [0, 4, 4]], [[0, 3, 4], [4, 0, 4], [4, 4, 0]], [[4, 4, 0], [4, 0, 3], [0, 4, 4]],
-          [[0, 4, 4], [4, 0, 4], [4, 3, 0]], [[3, 4, 0], [4, 0, 4], [0, 4, 4]], [[0, 4, 3], [4, 0, 4], [4, 4, 0]],
-          [[4, 4, 0], [4, 0, 4], [0, 4, 3]], [[0, 4, 4], [4, 0, 4], [3, 4, 0]], [[4, 4, 0], [4, 0, 4], [0, 4, 4]],
-          [[0, 4, 4], [4, 0, 4], [4, 4, 0]], [[4, 4, 0], [4, 0, 4], [0, 4, 4]], [[0, 4, 4], [4, 0, 4], [4, 4, 0]],
-          [[0, 3, 0], [3, 0, 3], [3, 4, 3]], [[3, 3, 0], [4, 0, 3], [3, 3, 0]], [[3, 4, 3], [3, 0, 3], [0, 3, 0]],
-          [[0, 3, 3], [3, 0, 4], [0, 3, 3]], [[0, 3, 0], [3, 0, 3], [3, 4, 4]], [[3, 3, 0], [4, 0, 3], [4, 3, 0]],
-          [[4, 4, 3], [3, 0, 3], [0, 3, 0]], [[0, 3, 4], [3, 0, 4], [0, 3, 3]], [[0, 3, 0], [3, 0, 4], [3, 4, 3]],
-          [[3, 3, 0], [4, 0, 3], [3, 4, 0]], [[3, 4, 3], [4, 0, 3], [0, 3, 0]], [[0, 4, 3], [3, 0, 4], [0, 3, 3]],
-          [[0, 3, 0], [3, 0, 4], [3, 4, 4]], [[3, 3, 0], [4, 0, 3], [4, 4, 0]], [[4, 4, 3], [4, 0, 3], [0, 3, 0]],
-          [[0, 4, 4], [3, 0, 4], [0, 3, 3]], [[0, 3, 0], [3, 0, 3], [4, 4, 4]], [[4, 3, 0], [4, 0, 3], [4, 3, 0]],
-          [[4, 4, 4], [3, 0, 3], [0, 3, 0]], [[0, 3, 4], [3, 0, 4], [0, 3, 4]], [[0, 3, 0], [3, 0, 4], [4, 4, 4]],
-          [[4, 3, 0], [4, 0, 3], [4, 4, 0]], [[4, 4, 4], [4, 0, 3], [0, 3, 0]], [[0, 4, 4], [3, 0, 4], [0, 3, 4]],
-          [[0, 4, 3], [3, 4, 0], [0, 0, 0]], [[0, 3, 0], [0, 4, 4], [0, 0, 3]], [[0, 0, 0], [0, 4, 3], [3, 4, 0]],
-          [[3, 0, 0], [4, 4, 0], [0, 3, 0]], [[0, 3, 0], [4, 0, 4], [4, 4, 4]], [[4, 4, 0], [4, 0, 3], [4, 4, 0]],
-          [[4, 4, 4], [4, 0, 4], [0, 3, 0]], [[0, 4, 4], [3, 0, 4], [0, 4, 4]]]
+          [[0, 3], [3, 4]], [[3, 0], [4, 3]], [[4, 3], [3, 0]], [[3, 4], [0, 3]], [[3, 3, 0], [3, 0, 3], [0, 4, 3]],
+          [[0, 3, 3], [4, 0, 3], [3, 3, 0]], [[3, 4, 0], [3, 0, 3], [0, 3, 3]], [[0, 3, 3], [3, 0, 4], [3, 3, 0]],
+          [[3, 3, 0], [3, 0, 3], [0, 4, 4]], [[0, 3, 3], [4, 0, 3], [4, 3, 0]], [[4, 4, 0], [3, 0, 3], [0, 3, 3]],
+          [[0, 3, 4], [3, 0, 4], [3, 3, 0]], [[3, 3, 0], [3, 0, 4], [0, 4, 3]], [[0, 3, 3], [4, 0, 3], [3, 4, 0]],
+          [[3, 4, 0], [4, 0, 3], [0, 3, 3]], [[0, 4, 3], [3, 0, 4], [3, 3, 0]], [[3, 3, 0], [3, 0, 4], [0, 4, 4]],
+          [[0, 3, 3], [4, 0, 3], [4, 4, 0]], [[4, 4, 0], [4, 0, 3], [0, 3, 3]], [[0, 4, 4], [3, 0, 4], [3, 3, 0]],
+          [[3, 4, 0], [3, 0, 4], [0, 4, 4]], [[0, 3, 3], [4, 0, 4], [4, 4, 0]], [[4, 4, 0], [4, 0, 3], [0, 4, 3]],
+          [[0, 4, 4], [4, 0, 4], [3, 3, 0]], [[4, 3, 0], [3, 0, 4], [0, 4, 4]], [[0, 3, 4], [4, 0, 3], [4, 4, 0]],
+          [[4, 4, 0], [4, 0, 3], [0, 3, 4]], [[0, 4, 4], [3, 0, 4], [4, 3, 0]], [[4, 4, 0], [3, 0, 4], [0, 4, 4]],
+          [[0, 3, 4], [4, 0, 4], [4, 4, 0]], [[4, 4, 0], [4, 0, 3], [0, 4, 4]], [[0, 4, 4], [4, 0, 4], [4, 3, 0]],
+          [[3, 4, 0], [4, 0, 4], [0, 4, 4]], [[0, 4, 3], [4, 0, 4], [4, 4, 0]], [[4, 4, 0], [4, 0, 4], [0, 4, 3]],
+          [[0, 4, 4], [4, 0, 4], [3, 4, 0]], [[4, 4, 0], [4, 0, 4], [0, 4, 4]], [[0, 4, 4], [4, 0, 4], [4, 4, 0]],
+          [[4, 4, 0], [4, 0, 4], [0, 4, 4]], [[0, 4, 4], [4, 0, 4], [4, 4, 0]], [[0, 3, 0], [3, 0, 3], [3, 4, 3]],
+          [[3, 3, 0], [4, 0, 3], [3, 3, 0]], [[3, 4, 3], [3, 0, 3], [0, 3, 0]], [[0, 3, 3], [3, 0, 4], [0, 3, 3]],
+          [[0, 3, 0], [3, 0, 3], [3, 4, 4]], [[3, 3, 0], [4, 0, 3], [4, 3, 0]], [[4, 4, 3], [3, 0, 3], [0, 3, 0]],
+          [[0, 3, 4], [3, 0, 4], [0, 3, 3]], [[0, 3, 0], [3, 0, 4], [3, 4, 3]], [[3, 3, 0], [4, 0, 3], [3, 4, 0]],
+          [[3, 4, 3], [4, 0, 3], [0, 3, 0]], [[0, 4, 3], [3, 0, 4], [0, 3, 3]], [[0, 3, 0], [3, 0, 4], [3, 4, 4]],
+          [[3, 3, 0], [4, 0, 3], [4, 4, 0]], [[4, 4, 3], [4, 0, 3], [0, 3, 0]], [[0, 4, 4], [3, 0, 4], [0, 3, 3]],
+          [[0, 3, 0], [3, 0, 3], [4, 4, 4]], [[4, 3, 0], [4, 0, 3], [4, 3, 0]], [[4, 4, 4], [3, 0, 3], [0, 3, 0]],
+          [[0, 3, 4], [3, 0, 4], [0, 3, 4]], [[0, 3, 0], [3, 0, 4], [4, 4, 4]], [[4, 3, 0], [4, 0, 3], [4, 4, 0]],
+          [[4, 4, 4], [4, 0, 3], [0, 3, 0]], [[0, 4, 4], [3, 0, 4], [0, 3, 4]], [[0, 4, 3], [3, 4, 0], [0, 0, 0]],
+          [[0, 3, 0], [0, 4, 4], [0, 0, 3]], [[0, 0, 0], [0, 4, 3], [3, 4, 0]], [[3, 0, 0], [4, 4, 0], [0, 3, 0]],
+          [[0, 3, 0], [4, 0, 4], [4, 4, 4]], [[4, 4, 0], [4, 0, 3], [4, 4, 0]], [[4, 4, 4], [4, 0, 4], [0, 3, 0]],
+          [[0, 4, 4], [3, 0, 4], [0, 4, 4]]]
 filteredDLs = []
 for dl in allDLs:
     if submatrix(waller(startstate), waller(dl)):
@@ -96,26 +99,33 @@ for dl in allDLs:
 
 @njit
 def ptdist(pt1, pt2):
-    return np.abs(pt1[1] - pt2[1]) + abs(pt1[0] - pt2[0])
+    return np.abs(pt1[1] - pt2[1]) + np.abs(pt1[0] - pt2[0])
 
-
-targets = np.argwhere((startstate == 5) | (startstate == 6))
-INADM = 10
-divisor = 0
-for target0 in targets:
-    for target1 in targets:
-        divisor += ptdist(target0, target1)
-print(f"goal heur: {divisor * INADM}")
 
 @jit(forceobj=True, parallel=True)
-def manheur(mhstate):
+def heur1(mhstate):
     targets = np.argwhere((mhstate == 5) | (mhstate == 6))
-    boxes = np.argwhere((mhstate == 4) | (mhstate == 6))
+    boxes = np.argwhere((mhstate == 4))
+    sum_ = 0
+    for box, target in zip(boxes, targets):
+        sum_ += np.abs(box[1] - target[1]) + abs(box[0] - target[0])
+    return sum_
+
+
+@jit(forceobj=True, parallel=True)
+def heur2(mhstate):
+    targets = np.argwhere((mhstate == 5))
+    boxes = np.argwhere((mhstate == 4))
     sum_ = 0
     for box in boxes:
         for target in targets:
             sum_ += np.abs(box[1] - target[1]) + abs(box[0] - target[0])
     return sum_
+
+
+@jit(forceobj=True, parallel=True)
+def heur3(mhstate):
+    return len(np.argwhere((mhstate == 4)))
 
 
 # checks for possible deadlocks. this function is state-dependent
@@ -204,6 +214,7 @@ def children(pstate):
     return childs
 
 
+INADM = 1000
 class State:
     def __init__(self, state, parent=None):
         self.state = state
@@ -212,19 +223,21 @@ class State:
             self.moves = 0
         else:
             self.moves = parent.moves + 1
-        self.heur = self.moves + manheur(self.state) * INADM
+        self.heur = heur2(self.state) * INADM
+        self.score = self.moves + self.heur
 
     def __eq__(self, other):
         return (self.state == other.state).all()
 
     def __gt__(self, other):
-        return self.heur > other.heur
+        return self.score > other.score
 
     def __hash__(self):
         return hash(self.state.tobytes())
 
 
 print("level dims:", len(startstate), len(startstate[0]))
+print("iter moves heur")
 stime = ptime()
 
 
@@ -235,14 +248,6 @@ def solve():
     i = 0
     while notvisited:
         parent = hpop(notvisited)
-        if solved(parent.state):
-            print(i, parent.moves)
-            while parent.parent is not None:
-                for row in parent.state:
-                    print(row)
-                print()
-                parent = parent.parent
-            return i, parent.moves
         visited.update({parent: parent.moves})
 
         for child in children(parent.state):
@@ -250,28 +255,95 @@ def solve():
             if cnode not in visited and cnode not in notvisited:
                 hpsh(notvisited, cnode)
 
+        if solved(parent.state):
+            print(i, parent.moves)
+            route = []
+            while parent.parent is not None:
+                for row in parent.state:
+                    print(row)
+                print()
+                route.append(parent.state)
+                parent = parent.parent
+            route.reverse()
+            return i, parent.moves, route
+
         i += 1
         if int(i) % 1000 == 0:
-            print(int(i), int(cnode.heur), int(cnode.moves))
+            print(int(i), int(parent.moves), int(parent.heur))
+            gc.collect()
+
     print("poopy")
 
 
-solve()
+expansions, route_length, route = solve()
+
 print(ptime() - stime)
 
-# stime = ptime()
-# for _ in range(10000):
-#     children(startstate)
-# print((ptime() - stime) / 10000, ptime()-stime)
 
-# childs = children(startstate)
-# for row in startstate:
-#     print(row)
-# print()
-# print()
-#
-# for child in childs:
-#     for row in child:
-#         print(row)
-#     print()
-# print(len(childs))
+import pygame
+
+w = len(startstate[0])
+h = len(startstate)
+
+csize = 32
+pygame.init()
+pygame.display.init()
+screen = pygame.display.set_mode(((w + 1) * csize, (h + 1) * csize))
+pygame.display.set_caption(lname)
+
+# pygame resources
+font = pygame.font.SysFont("Courier", 20, bold=True)
+
+player = pygame.image.load("resources/robot_on_ground.png").convert()
+player_on_target = pygame.image.load("resources/robot_on_target.png").convert()
+wall = pygame.image.load("resources/wall.png").convert()
+box = pygame.image.load("resources/box.png").convert()
+empty_target = pygame.image.load("resources/empty_target.png").convert()
+full_target = pygame.image.load("resources/full_target.png").convert()
+full_ground = pygame.image.load("resources/full_ground.png").convert()
+icon = pygame.transform.scale(pygame.image.load("resources/icon.png").convert(), (csize, csize))
+
+
+print(len(route))
+while 1:
+    for state in route:
+        pygame.event.pump()
+
+        screen.fill((155, 173, 183))
+        screen.blit(full_ground, (0, 0))
+
+        for i in range(1, w + 1):
+            letter = font.render(chr(i + 64), True, (0, 0, 0))
+            rect = pygame.Rect(i * csize, 0, csize, csize)
+            pygame.draw.rect(screen, (0, 0, 0), rect, width=2)
+            screen.blit(letter, (i * csize + 10, 4))
+        for j in range(1, h + 1):
+            letter = font.render(chr(j + 96), True, (0, 0, 0))
+            rect = pygame.Rect(0, j * csize, csize, csize)
+            pygame.draw.rect(screen, (0, 0, 0), rect, width=2)
+            screen.blit(letter, (10, j * csize + 4))
+
+        screen.blit(icon, (0, 0))
+
+        pi, pj = 0, 0
+        for i in range(w):
+            for j in range(h):
+                ci = (i + 1) * csize
+                cj = (j + 1) * csize
+                cell = state[j][i]
+                if cell == 1:
+                    pi, pj = i, j
+                    screen.blit(player, (ci, cj))
+                elif cell == 2:
+                    pi, pj = i, j
+                    screen.blit(player_on_target, (ci, cj))
+                elif cell == 3:
+                    screen.blit(wall, (ci, cj))
+                elif cell == 4:
+                    screen.blit(box, (ci, cj))
+                elif cell == 5:
+                    screen.blit(empty_target, (ci, cj))
+                elif cell == 6:
+                    screen.blit(full_target, (ci, cj))
+        pygame.time.delay(100)
+        pygame.display.update()

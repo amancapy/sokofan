@@ -1,8 +1,14 @@
+import os.path
 import pygame
+import random
 
 # read and save .xsb as 2d list
-chosen = "1"
-level = open(f"newxsbs1/{chosen}.xsb").read().split("\n\n")
+chosen = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 50)}.xsb"
+while not os.path.exists(chosen):
+    chosen = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 50)}.xsb"
+print(chosen)
+chosen = "xsbs/13/44.xsb"
+level = open(chosen).read().split("\n\n")
 lname = chosen.split("/")[0] + "/" + level[0].split("; ")[1]
 level = [list(thing) for thing in level[1].split("\n")]
 w = len(level[0])
@@ -40,7 +46,7 @@ resets = 0
 
 def level_reset(winbool):
     global losses, wins, resets, moves
-    lvl = open(f"newxsbs2/{chosen}.xsb").read().split("\n\n")
+    lvl = open(chosen).read().split("\n\n")
     lvl = [list(thing) for thing in lvl[1].split("\n")]
 
     if winbool:
@@ -155,8 +161,8 @@ while 1:
                         if level[pj - 2][pi] == " ":
                             level[pj - 2][pi] = "$"
                             level[pj - 1][pi] = "@" if ucell == "$" else "+"
-                            moves += 1
                             level[pj][pi] = currc
+                            moves += 1
                         elif level[pj - 2][pi] == ".":
                             level[pj - 2][pi] = "*"
                             level[pj - 1][pi] = "@" if ucell == "$" else "+"
@@ -233,7 +239,6 @@ while 1:
                             level[pj][pi + 2] = "*"
                             level[pj][pi + 1] = "@" if rcell == "$" else "+"
                             level[pj][pi] = currc
-                        moves += 1
+                            moves += 1
 
-    pygame.time.Clock().tick(45)
     pygame.display.flip()
