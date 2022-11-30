@@ -1,7 +1,7 @@
 # sokofan
 **Artificial Intelligence CSD311 project to make a sokoban solver**
 
-![sisyphus](https://user-images.githubusercontent.com/111729660/204849029-62975d86-b4c8-46bf-b922-918982a07c4a.gif)
+![sokogif](https://user-images.githubusercontent.com/111729660/204851864-7b40b1f4-6470-489c-89e6-76e887693169.gif)
 
 A* with tree pruning using a decently sized deadlock database. The more complicated prunes such as corrals are beyond the scope of a single dude carrying a semester group project. The textures too I have designed myself ❤️
 
