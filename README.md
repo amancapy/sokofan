@@ -7,6 +7,4 @@ A* with tree pruning using a decently sized deadlock database. The more complica
 
 27/11: simple heuristic, passable solve times on smaller levels. the bottleneck is the heap operations themselves unfortunately.
 
-
-https://user-images.githubusercontent.com/111729660/204848566-48ce88a8-8243-4485-9174-ca5757241178.mp4
-
+![sisyphus](https://user-images.githubusercontent.com/111729660/204849029-62975d86-b4c8-46bf-b922-918982a07c4a.gif)
