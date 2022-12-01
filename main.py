@@ -35,7 +35,7 @@ def solved(sstate):
 # while not os.path.exists(pick):
 #     pick = f"xsbs/{random.randint(1, 15)}/{random.randint(1, 100)}.xsb"
 
-pick = "newxsbs1/1.xsb"
+pick = "newxsbs2/6.xsb"
 startstate = open(pick).read().split("\n\n")
 lname = pick.split("/")[0] + "/" + startstate[0].split("; ")[1]
 startstate = startstate[1].split("\n")
@@ -61,13 +61,9 @@ def submatrix(mat, smat):
 
 
 # filtering the deadlocks
-allDLs = [[[6, 6], [6, 4]], [[6, 6], [4, 6]], [[4, 6], [6, 6]], [[6, 4], [6, 6]], [[6, 4], [6, 4]], [[6, 6], [4, 4]],
-          [[4, 6], [4, 6]], [[4, 4], [6, 6]], [[4, 4], [6, 4]], [[6, 4], [4, 4]], [[4, 6], [4, 4]], [[4, 4], [4, 6]],
-          [[6, 4], [4, 6]], [[4, 6], [6, 4]], [[6, 4], [4, 6]], [[4, 6], [6, 4]], [[3, 3], [3, 4]], [[3, 3], [4, 3]],
-          [[4, 3], [3, 3]], [[3, 4], [3, 3]], [[3, 4], [3, 4]], [[3, 3], [4, 4]], [[4, 3], [4, 3]], [[4, 4], [3, 3]],
-          [[4, 4], [3, 4]], [[3, 4], [4, 4]], [[4, 3], [4, 4]], [[4, 4], [4, 3]], [[4, 4], [4, 4]], [[4, 4], [4, 4]],
-          [[4, 4], [4, 4]], [[4, 4], [4, 4]], [[3, 4], [4, 3]], [[4, 3], [3, 4]], [[3, 4], [4, 3]], [[4, 3], [3, 4]],
-          [[0, 3], [3, 4]], [[3, 0], [4, 3]], [[4, 3], [3, 0]], [[3, 4], [0, 3]], [[3, 3, 0], [3, 0, 3], [0, 4, 3]],
+allDLs = [[[3, 3], [3, 4]], [[3, 3], [4, 3]], [[4, 3], [3, 3]], [[3, 4], [3, 3]], [[3, 4], [3, 4]], [[3, 3], [4, 4]],
+          [[4, 3], [4, 3]], [[4, 4], [3, 3]], [[4, 4], [3, 4]], [[3, 4], [4, 4]], [[4, 3], [4, 4]], [[4, 4], [4, 3]],
+          [[4, 4], [4, 4]], [[4, 4], [4, 4]], [[4, 4], [4, 4]], [[4, 4], [4, 4]], [[3, 3, 0], [3, 0, 3], [0, 4, 3]],
           [[0, 3, 3], [4, 0, 3], [3, 3, 0]], [[3, 4, 0], [3, 0, 3], [0, 3, 3]], [[0, 3, 3], [3, 0, 4], [3, 3, 0]],
           [[3, 3, 0], [3, 0, 3], [0, 4, 4]], [[0, 3, 3], [4, 0, 3], [4, 3, 0]], [[4, 4, 0], [3, 0, 3], [0, 3, 3]],
           [[0, 3, 4], [3, 0, 4], [3, 3, 0]], [[3, 3, 0], [3, 0, 4], [0, 4, 3]], [[0, 3, 3], [4, 0, 3], [3, 4, 0]],
@@ -87,14 +83,16 @@ allDLs = [[[6, 6], [6, 4]], [[6, 6], [4, 6]], [[4, 6], [6, 6]], [[6, 4], [6, 6]]
           [[3, 3, 0], [4, 0, 3], [4, 4, 0]], [[4, 4, 3], [4, 0, 3], [0, 3, 0]], [[0, 4, 4], [3, 0, 4], [0, 3, 3]],
           [[0, 3, 0], [3, 0, 3], [4, 4, 4]], [[4, 3, 0], [4, 0, 3], [4, 3, 0]], [[4, 4, 4], [3, 0, 3], [0, 3, 0]],
           [[0, 3, 4], [3, 0, 4], [0, 3, 4]], [[0, 3, 0], [3, 0, 4], [4, 4, 4]], [[4, 3, 0], [4, 0, 3], [4, 4, 0]],
-          [[4, 4, 4], [4, 0, 3], [0, 3, 0]], [[0, 4, 4], [3, 0, 4], [0, 3, 4]], [[0, 4, 3], [3, 4, 0], [0, 0, 0]],
-          [[0, 3, 0], [0, 4, 4], [0, 0, 3]], [[0, 0, 0], [0, 4, 3], [3, 4, 0]], [[3, 0, 0], [4, 4, 0], [0, 3, 0]],
-          [[0, 3, 0], [4, 0, 4], [4, 4, 4]], [[4, 4, 0], [4, 0, 3], [4, 4, 0]], [[4, 4, 4], [4, 0, 4], [0, 3, 0]],
-          [[0, 4, 4], [3, 0, 4], [0, 4, 4]]]
+          [[4, 4, 4], [4, 0, 3], [0, 3, 0]], [[0, 4, 4], [3, 0, 4], [0, 3, 4]], [[0, 4, 3], [0, 4, 3]],
+          [[0, 0], [4, 4], [3, 3]], [[3, 4, 0], [3, 4, 0]], [[3, 3], [4, 4], [0, 0]], [[0, 3, 0], [4, 0, 4], [4, 4, 4]],
+          [[4, 4, 0], [4, 0, 3], [4, 4, 0]], [[4, 4, 4], [4, 0, 4], [0, 3, 0]], [[0, 4, 4], [3, 0, 4], [0, 4, 4]],
+          [[4, 4], [4, 4]], [[4, 4], [4, 4]], [[4, 4], [4, 4]], [[4, 4], [4, 4]], [[4, 4], [4, 6]], [[4, 4], [6, 4]],
+          [[6, 4], [4, 4]], [[4, 6], [4, 4]], [[4, 4], [6, 6]], [[6, 4], [6, 4]], [[6, 6], [4, 4]], [[4, 6], [4, 6]],
+          [[6, 6], [6, 4]], [[6, 6], [4, 6]], [[4, 6], [6, 6]], [[6, 4], [6, 6]]]
 filteredDLs = []
 for dl in allDLs:
     if submatrix(waller(startstate), waller(dl)):
-        filteredDLs.append(dl)
+        filteredDLs.append(np.array(dl, dtype=np.uint8))
 
 
 @njit
@@ -104,11 +102,11 @@ def ptdist(pt1, pt2):
 
 @jit(forceobj=True, parallel=True)
 def heur1(mhstate):
-    targets = np.argwhere((mhstate == 5) | (mhstate == 6))
+    targets = np.argwhere((mhstate == 5))
     boxes = np.argwhere((mhstate == 4))
     sum_ = 0
     for box, target in zip(boxes, targets):
-        sum_ += np.abs(box[1] - target[1]) + abs(box[0] - target[0])
+        sum_ += np.abs(box[1] - target[1]) + np.abs(box[0] - target[0])
     return sum_
 
 
@@ -119,7 +117,7 @@ def heur2(mhstate):
     sum_ = 0
     for box in boxes:
         for target in targets:
-            sum_ += np.abs(box[1] - target[1]) + abs(box[0] - target[0])
+            sum_ += np.abs(box[1] - target[1]) + np.abs(box[0] - target[0])
     return sum_
 
 
@@ -132,7 +130,7 @@ def heur3(mhstate):
 @jit(forceobj=True, parallel=True)
 def deadlock(dlstate):
     for dl in filteredDLs:
-        if bool(submatrix(dlstate, np.array(dl, dtype=np.uint8))):
+        if bool(submatrix(dlstate, dl)):
             return True
     return False
 
@@ -151,37 +149,31 @@ def wallock(wlstate, ploc, nloc):
 
     # up down
     if pi != bi:
-        if pi < bi:
-            over = bi + 1
-        else:
-            over = bi - 1
+        over = bi + 1 if pi < bi else bi - 1
         for cj in prange(bj, 0, -1):
-            if wlstate[bi, cj] not in (0, 3):
+            if wlstate[bi, cj] != 0 or wlstate[over, cj] != 3:
                 return False
-            elif wlstate[over, cj] != 3:
+            if wlstate[bi, cj] == 3:
                 break
         for cj in prange(bj, len(wlstate[0])):
-            if wlstate[bi, cj] not in (0, 3):
+            if wlstate[bi, cj] != 0 or wlstate[over, cj] != 3:
                 return False
-            elif wlstate[over, cj] != 3:
+            if wlstate[bi, cj] == 3:
                 return True
         return False
 
     # left right
     elif pj != bj:
-        if pj < bj:
-            over = bj + 1
-        else:
-            over = bj - 1
+        over = bj + 1 if pj < bj else bj - 1
         for ci in prange(bi, 0, -1):
-            if wlstate[ci, bj] not in (0, 3):
+            if wlstate[ci, bj] != 0 or wlstate[ci, over] != 3:
                 return False
-            elif wlstate[ci, over] != 3:
+            if wlstate[ci, bj] == 3:
                 break
         for ci in prange(bj, len(wlstate[0])):
-            if wlstate[ci, bj] not in (0, 3):
+            if wlstate[ci, bj] != 0 or wlstate[ci, over] != 3:
                 return False
-            elif wlstate[ci, over] != 3:
+            if wlstate[ci, bj] == 3:
                 return True
         return False
 
@@ -214,7 +206,7 @@ def children(pstate):
     return childs
 
 
-INADM = 1000
+INADM = 100
 class State:
     def __init__(self, state, parent=None):
         self.state = state
@@ -223,11 +215,11 @@ class State:
             self.moves = 0
         else:
             self.moves = parent.moves + 1
-        self.heur = heur2(self.state) * INADM
+        self.heur = heur1(self.state) * INADM
         self.score = self.moves + self.heur
 
     def __eq__(self, other):
-        return (self.state == other.state).all()
+        return (self.state == other.state).all() and self.moves <= other.moves
 
     def __gt__(self, other):
         return self.score > other.score
@@ -245,6 +237,7 @@ def solve():
     visited = {}
     notvisited = [State(startstate)]
     hpfy(notvisited)
+
     i = 0
     while notvisited:
         parent = hpop(notvisited)
@@ -252,7 +245,7 @@ def solve():
 
         for child in children(parent.state):
             cnode = State(child, parent)
-            if cnode not in visited and cnode not in notvisited:
+            if cnode.moves <= 300 and cnode not in visited and cnode not in notvisited:
                 hpsh(notvisited, cnode)
 
         if solved(parent.state):
@@ -264,20 +257,46 @@ def solve():
                 print()
                 route.append(parent.state)
                 parent = parent.parent
+            route.append(startstate)
             route.reverse()
             return i, parent.moves, route
 
         i += 1
         if int(i) % 1000 == 0:
-            print(int(i), int(parent.moves), int(parent.heur))
+            print(int(i), int(parent.moves), int(parent.heur / INADM))
             gc.collect()
 
-    print("poopy")
+    print("poopy")  # exhausted depth without finding solution
 
 
 expansions, route_length, route = solve()
-
 print(ptime() - stime)
+
+
+indseq = []
+for state in route:
+    nextind = (np.argwhere((state == 1) | (state == 2))).flatten()
+    indseq.append(nextind)
+
+ans = ""
+for i in range(len(route) - 1):
+    nextind = indseq[i + 1]
+    diff = nextind - indseq[i]
+
+    if diff[0] == -1:
+        drn = 'u'
+    elif diff[0] == 1:
+        drn = 'd'
+    elif diff[1] == -1:
+        drn = 'l'
+    else:
+        drn = 'r'
+
+    if route[i][nextind[0], nextind[1]] in (4, 6):
+        drn = drn.upper()
+    ans += drn
+
+print(ans)
 
 
 import pygame
@@ -302,7 +321,6 @@ empty_target = pygame.image.load("resources/empty_target.png").convert()
 full_target = pygame.image.load("resources/full_target.png").convert()
 full_ground = pygame.image.load("resources/full_ground.png").convert()
 icon = pygame.transform.scale(pygame.image.load("resources/icon.png").convert(), (csize, csize))
-
 
 print(len(route))
 while 1:
