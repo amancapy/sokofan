@@ -10,3 +10,6 @@ A* with tree pruning using a decently sized deadlock database. The more complica
 27/11: simple heuristic, passable solve times on smaller levels. the bottleneck is the heap operations themselves unfortunately.
 
 Room for improvement: the deadlock database comparer could treat 0 (empty) space as -1 (any), indicating that even if the empty cell were any other cell, the submatrix is still a deadlock. this would up the probability of detecting deadlocks significantly. Additionally I don't believe my wallock check is *correct* in that I wouldn't bet my money on it even though it has served well on all test cases. I had to throw it together on a weekend evening because the group project ended up being just me doing all of it.
+
+
+late edit: why python? it was required of us to stick to python. I would've liked to use the project to gain experience with c++ or r but it would've been the same principles anyway.
